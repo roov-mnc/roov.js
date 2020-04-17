@@ -10,7 +10,7 @@ roov.js is a simple audio library for browser. It extends the HTML5 audio to sup
 - pure javascript with one dependency(HLS.js)
 - expressive api
 - expose native api
-- play wide range of audio type(m3u8, hls, acc, mp3, mpeg, etc)
+- play wide range of audio type(m3u8/hls, aac, mp3, mpeg, etc)
 - adaptive bit rate(HLS)
 - seek
 - fast forward
@@ -177,7 +177,7 @@ the source of the audio, wether it stream or file.
 ##### onLoaded function
 fires when audio is loaded/ready to play
 
-##### ononTimeUpdateLoaded function
+##### onTimeUpdateLoaded function
 fires when time is being updated, usefull to execute something at x time.
 
 ##### onBuffering function
