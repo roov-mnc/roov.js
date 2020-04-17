@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>ROOV JS</title>
+		<script src="dist/index.js"></script>
+		<script type="text/javascript">
+			audio = new roov.audio({
+				onLoaded: () => {
+					document.getElementById("duration").innerHTML = audio.duration();
+				}
+			});
+		</script>
+	</head>
+	<body>
+		<h4>Common radio streaming</h4>
+		<div>
+			<button
+				onclick="audio.play('http://202.148.12.92:8000/radio.mp3?1564923872')"
+			>
+				DJ FM Surabaya
+			</button>
+			<button
+				onclick="audio.play('http://usa.jogjastreamers.com:8000/soloradio151515stereo')"
+			>
+				SOLO Radio
+			</button>
+			<button onclick="audio.play('http://gajahmada.i.streaming.id:8000/live')">
+				GAJAH MADA FM
+			</button>
+			<button onclick="audio.play('http://103.66.86.5:8000/;')">MADAM</button>
+			<button
+				onclick="audio.play('http://live.kissfm-medan.com:8080/kissfm.mp3')"
+			>
+				KISS FM
+			</button>
+			<button onclick="audio.play('http://listento.ardanradio.com:1059/;')">
+				ARDAN
+			</button>
+			<button onclick="audio.play('http://202.147.199.98:80/;')">GLOBAL</button>
+			<button onclick="audio.play('http://45.64.97.211:1031/;stream.nsv')">
+				OZ
+			</button>
+		</div>
+
+		<h4>HLS radio streaming</h4>
+		<div>
+			<button
+				onclick="audio.play('http://wow2.mari.co.id:1935/mari/genfm/playlist.m3u8')"
+			>
+				GEN
+			</button>
+			<button
+				onclick="audio.play('http://wow2.mari.co.id:1935/mari/jakfm/playlist.m3u8')"
+			>
+				JAK
+			</button>
+			<button
+				onclick="audio.play('https://cogecomedia.leanstream.co/cogecomedia/CKBEFM.stream/playlist.m3u8')"
+			>
+				ESPANA(HLS)
+			</button>
+		</div>
+
+		<h4>Play AUDIO</h4>
+		<div>
+			<button onclick="audio.play('https://raw.githubusercontent.com/goldfire/howler.js/master/examples/player/audio/80s_vibe.mp3')">
+				80 vibes
+			</button>
+			<button onclick="audio.play('https://raw.githubusercontent.com/goldfire/howler.js/master/examples/player/audio/rave_digger.mp3')">
+				Rave digger
+			</button>
+		</div>
+
+		<h4>Control</h4>
+		<button onclick="audio.pause()">PAUSE</button>
+		<button onclick="audio.play()">PLAY</button>
+		<button onclick="audio.stop()">STOP</button>
+		<button onclick="audio.unload()">UNLOAD</button>
+		<button onclick="audio.restart()">RESTART</button>
+
+		<h4>Stats</h4>
+		<p>duration : <span id="duration"></span></p>
+	</body>
+</html>

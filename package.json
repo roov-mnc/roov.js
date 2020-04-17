@@ -1,0 +1,29 @@
+{
+  "name": "roov",
+  "version": "0.0.1",
+  "description": "roov javascript library",
+  "main": "dist/index.js",
+  "author": "ef",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "build": "webpack",
+    "watch": "webpack --watch"
+  },
+  "keywords": [
+    "radio",
+    "audio",
+    "hls",
+    "m3u8"
+  ],
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "babel-loader": "^8.1.0",
+    "terser-webpack-plugin": "^2.3.5",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11"
+  },
+  "dependencies": {
+    "hls.js": "^0.13.2"
+  }
+}
