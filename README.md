@@ -1,10 +1,12 @@
+![npm](https://img.shields.io/npm/v/roov)![npm bundle size](https://img.shields.io/bundlephobia/minzip/roov)
+
 # ROOV.js
 
 ### Description
 roov.js is a simple audio library for browser. It extends the HTML5 audio to support HLS/m3u8 and provide easy to use API. Currently being implemented on https://roov.id
 
 ### Overview
-- tiny library(<4kb)
+- small library(~50k)
 - pure javascript with one dependency(HLS.js)
 - expressive api
 - expose native api

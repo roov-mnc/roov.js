@@ -1,0 +1,11 @@
+language: node_js
+node_js:
+- '12.13'
+deploy:
+  provider: npm
+  email: roovdev.agradio@gmail.com
+  api_key:
+    secure: MTOET7g98tmeE49RR0zxn4VhIl8u7A4nuvodhzCCgzOKsbGm8HZRDPXdKSAe0amhZATka8jQwTQ3DoFLXN+WXCb/WSvZkXXWVVA0+FsSqho7KAsvO9GetdrkUwIzGIyZwBJiguq9bbwUP9kUx4FDz8gM31V68+X/aEeAXRrY/dDat1jUS77g/smVJVanf+gp0t/9iIolmlsY/Eg4feRpf+L5kVTU6awr8kq62GbjcRk4sN4OXL+n3gJXq/gMvRdXtmqW6wp2nlRFW/sbWGvSxX6puROkLGhrMKUrmhsNoa6eyuKFK8N0fzBYVkJuO5GKanz0ZntkL+AYgOTGQ6dMyllJPI2MVq8tEEG0jBJUAwc4+s2cyG+vl/Gn4i0PEJNp7RARbXa/c+vwzY6XvMliE7e+ldQlihvHXVDuOV8fLPM4Ca78eTgTnLxdOVu4P8JP6fzpMTa+5b3EAVdVMpjEhrt26/23paEjQZSTWwBZegz8RuhqTCbutx96dCADY9WURhxqL5oSqsWDf6L5SZ2lqtLcLVJlghnx2ottZI/Y3O2/SH9ntcOfbbYM7G9AlwgqNs+vYgDTGBMRyOYHZRJj80nc7rVoj4oJanmGAGaJqYpIcSYPeOfdJs1NiVBxGQd8ZdVHHCs4e5T3F2CbJ6ok00GZRNML3guGFwabpkHWkyI=
+  on:
+    tags: true
+    repo: roov-mnc/roov.js
