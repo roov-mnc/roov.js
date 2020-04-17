@@ -1,4 +1,4 @@
-![npm](https://img.shields.io/npm/v/roov)![npm bundle size](https://img.shields.io/bundlephobia/minzip/roov)[![Build Status](https://travis-ci.org/roov-mnc/roov.js.svg?branch=master)](https://travis-ci.org/roov-mnc/roov.js)
+![npm](https://img.shields.io/npm/v/roov)! [npm bundle size](https://img.shields.io/bundlephobia/minzip/roov) [![Build Status](https://travis-ci.org/roov-mnc/roov.js.svg?branch=master)](https://travis-ci.org/roov-mnc/roov.js)
 
 # ROOV.js
 

@@ -8,6 +8,7 @@ module.exports = {
     filename: "index.js",
     library: "roov",
     libraryTarget: "umd",
+    globalObject: `typeof self !== 'undefined' ? self : this`
   },
   module: {
     rules: [
