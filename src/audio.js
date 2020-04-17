@@ -2,24 +2,35 @@ const hls = require("hls.js/dist/hls.light");
 
 export default class audio {
 	constructor(config) {
-		const { src = "", limit = 0, onLoaded = null } = { ...config };
+		const { src = "", limit = 0, onLoaded = null, onTimeUpdate = null } = { ...config };
 		this._audio = new Audio(src);
 		this._hls = null;
 		if (onLoaded) {
 			this._audio.addEventListener("canplay", onLoaded);
 		}
+		this._audio.addEventListener("timeupdate", (e) => {
+			if (onTimeUpdate) {
+				onTimeUpdate()
+			}
+		})
 	}
 
 	play(src) {
 		if (this.isPlaying() && !src) {
-			return 
+			return;
 		}
-		
+
 		if (!this._audio.src && !src) {
 			throw new Error("empty src");
 		}
 
 		if (src) {
+			if (this._hls) {
+				this._hls.detachMedia()
+				this._hls.stopLoad();
+				this._hls.destroy();
+				this._hls = null
+			}
 			this._audio.src = src;
 		}
 
@@ -38,10 +49,6 @@ export default class audio {
 				promise = this._audio.play();
 			});
 		} else {
-			if (this._hls) {
-				this._hls.destroy();
-				this._hls = null;
-			}
 			promise = this._audio.play();
 		}
 
@@ -76,7 +83,7 @@ export default class audio {
 	}
 
 	isHLS() {
-		return this._hls || this._audio.src.split(".").pop() === "m3u8";
+		return this._audio.src.split(".").pop() === "m3u8";
 	}
 
 	native() {
@@ -89,5 +96,13 @@ export default class audio {
 
 	isPlaying() {
 		return !this._audio.paused;
+	}
+
+	current() {
+		return this._audio.src
+	}
+
+	currentTime() {
+		return this._audio.currentTime
 	}
 }

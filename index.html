@@ -8,7 +8,11 @@
 			audio = new roov.audio({
 				onLoaded: () => {
 					document.getElementById("duration").innerHTML = audio.duration();
-				}
+					document.getElementById("current").innerHTML = audio.current();
+				},
+				onTimeUpdate: () => {
+					document.getElementById("currentTime").innerHTML = audio.currentTime();
+				},
 			});
 		</script>
 	</head>
@@ -80,6 +84,8 @@
 		<button onclick="audio.restart()">RESTART</button>
 
 		<h4>Stats</h4>
+		<p>current playing : <span id="current"></span></p>
+		<p>current time : <span id="currentTime"></span></p>
 		<p>duration : <span id="duration"></span></p>
 	</body>
 </html>

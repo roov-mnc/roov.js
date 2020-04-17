@@ -7,3 +7,5 @@
 - expose web audio API
 - handle playlist
 - limit playback
+- get buffer size
+- rewind and forward
