@@ -1,6 +1,6 @@
 {
   "name": "roov",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "roov.js is a simple audio library for browser. It extends the HTML5 audio to support HLS/m3u8 and provide easy to use API. Currently being implemented on https://roov.id",
   "main": "dist/index.js",
   "author": "ef",

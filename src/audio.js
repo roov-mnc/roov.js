@@ -1,4 +1,4 @@
-const hls = require("hls.js/dist/hls.light");
+import hls from "hls.js/dist/hls.light";
 
 export default class audio {
 	constructor(config) {
