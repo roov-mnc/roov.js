@@ -1,11 +1,14 @@
-## roadmap
-- play preroll, mid etc
-- play hls (application/vnd.apple.mpegurl)
-- adaptive streaming
-- event on x seconds
-- expose audio element api
-- expose web audio API
-- handle playlist
-- limit playback
-- get buffer size
-- rewind and forward
+## Overview
+- tiny library(<5kb)
+- only has one dependency(HLS.js)
+- expressive api
+- expose native api
+- play wide range of audio type(m3u8, hls, acc, mp3, mpeg, etc)
+- adaptive bit rate
+- seek
+- fast forward
+- rewind
+- common events(onLoaded,onPlaying,onBuffering,onFinish,onTimeUpdate, getBufferLength,onTotalPlayTime)
+- easily get buffer size
+
+

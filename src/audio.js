@@ -2,17 +2,55 @@ const hls = require("hls.js/dist/hls.light");
 
 export default class audio {
 	constructor(config) {
-		const { src = "", limit = 0, onLoaded = null, onTimeUpdate = null } = { ...config };
+		const {
+			src = "",
+			limit = 0,
+			onLoaded = null,
+			onTimeUpdate = null,
+			onBuffering = null,
+			onPlaying = null,
+			loop = false,
+			onFinish = null,
+			getBufferLength = null,
+		} = { ...config };
 		this._audio = new Audio(src);
 		this._hls = null;
+		this._audio.loop = loop;
 		if (onLoaded) {
 			this._audio.addEventListener("canplay", onLoaded);
 		}
+		if (onPlaying) {
+			this._audio.addEventListener("playing", onPlaying);
+		}
+		if (onBuffering) {
+			this._audio.addEventListener("waiting", onBuffering);
+		}
+		if (onFinish) {
+			this._audio.addEventListener("ended", onFinish);
+		}
 		this._audio.addEventListener("timeupdate", (e) => {
 			if (onTimeUpdate) {
-				onTimeUpdate()
+				onTimeUpdate();
 			}
-		})
+			if (getBufferLength) {
+				const buffered = this._audio.buffered;
+				const duration = this._audio.duration;
+				if (buffered.length > 0) {
+					
+						for (var i = 0; i < buffered.length; i++) {
+							if (buffered.start(buffered.length - 1 - i) < this._audio.currentTime) {
+								let bufferLength =
+									(buffered.end(buffered.length - 1 - i) / duration) * 100;
+								let played = (this._audio.currentTime / duration) * 100;
+								getBufferLength(played, bufferLength);				
+								break;
+							}
+						}
+					
+				}
+				
+			}
+		});
 	}
 
 	play(src) {
@@ -26,10 +64,10 @@ export default class audio {
 
 		if (src) {
 			if (this._hls) {
-				this._hls.detachMedia()
+				this._hls.detachMedia();
 				this._hls.stopLoad();
 				this._hls.destroy();
-				this._hls = null
+				this._hls = null;
 			}
 			this._audio.src = src;
 		}
@@ -99,10 +137,26 @@ export default class audio {
 	}
 
 	current() {
-		return this._audio.src
+		return this._audio.src;
 	}
 
 	currentTime() {
-		return this._audio.currentTime
+		return this._audio.currentTime;
+	}
+
+	seek(time) {
+		this._audio.currentTime = time
+	}
+
+	loop() {
+		this._audio.loop = !this._audio.loop
+	}
+
+	forward(time) {
+		this._audio.currentTime += time
+	}
+
+	rewind(time) {
+		this._audio.currentTime -= time
 	}
 }

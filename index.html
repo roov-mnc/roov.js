@@ -5,15 +5,40 @@
 		<title>ROOV JS</title>
 		<script src="dist/index.js"></script>
 		<script type="text/javascript">
-			audio = new roov.audio({
-				onLoaded: () => {
-					document.getElementById("duration").innerHTML = audio.duration();
-					document.getElementById("current").innerHTML = audio.current();
-				},
-				onTimeUpdate: () => {
-					document.getElementById("currentTime").innerHTML = audio.currentTime();
-				},
-			});
+				audio = new roov.audio({
+					onLoaded: () => {
+						document.getElementById("duration").innerHTML = audio.duration();
+						document.getElementById("current").innerHTML = audio.current();
+					},
+					onTimeUpdate: () => {
+						document.getElementById("currentTime").innerHTML = audio.currentTime();
+					},
+					onPlaying: () => {
+						document.getElementById("state").innerHTML = "playing";
+					},
+					onBuffering: () => {
+						document.getElementById("state").innerHTML = "buffering";
+					},
+					onFinish: () => {
+						document.getElementById("state").innerHTML = "finish";
+					},
+					getBufferLength: (played,bufferLength) => {
+						document.getElementById("buffer").innerHTML = played+" / "+bufferLength;
+					}
+				});
+
+			function seek(event) {
+			  	if (event.which == 13 || event.keyCode == 13) {
+						audio.seek(event.target.value)
+			      return false;
+			  	}
+			  	return true;
+			}
+
+			function loop() {
+				audio.loop()
+				document.getElementById("loop").innerHTML = audio.native().loop;
+			}
 		</script>
 	</head>
 	<body>
@@ -68,10 +93,14 @@
 
 		<h4>Play AUDIO</h4>
 		<div>
-			<button onclick="audio.play('https://raw.githubusercontent.com/goldfire/howler.js/master/examples/player/audio/80s_vibe.mp3')">
+			<button
+				onclick="audio.play('https://raw.githubusercontent.com/goldfire/howler.js/master/examples/player/audio/80s_vibe.mp3')"
+			>
 				80 vibes
 			</button>
-			<button onclick="audio.play('https://raw.githubusercontent.com/goldfire/howler.js/master/examples/player/audio/rave_digger.mp3')">
+			<button
+				onclick="audio.play('https://raw.githubusercontent.com/goldfire/howler.js/master/examples/player/audio/rave_digger.mp3')"
+			>
 				Rave digger
 			</button>
 		</div>
@@ -82,10 +111,19 @@
 		<button onclick="audio.stop()">STOP</button>
 		<button onclick="audio.unload()">UNLOAD</button>
 		<button onclick="audio.restart()">RESTART</button>
+		<br /><br />
+		<div>seek : <input type="number"  onkeypress="seek(event)" /></div>
+		<br /><br />
+		<button onclick="audio.forward(5)">FORWARD 5s</button>
+		<button onclick="audio.rewind(5)">REWIND 5s</button>
+		<button onclick="loop()">LOOP</button>
 
 		<h4>Stats</h4>
 		<p>current playing : <span id="current"></span></p>
 		<p>current time : <span id="currentTime"></span></p>
+		<p>buffer length : <span id="buffer"></span></p>
+		<p>state : <span id="state"></span></p>
 		<p>duration : <span id="duration"></span></p>
+		<p>loop : <span id="loop"></span></p>
 	</body>
 </html>
