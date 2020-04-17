@@ -177,8 +177,11 @@ the source of the audio, wether it stream or file.
 ##### onLoaded function
 fires when audio is loaded/ready to play
 
-##### ononTimeUpdateLoaded function
+##### onTimeUpdateLoaded function
 fires when time is being updated, usefull to execute something at x time.
+
+##### onloaderror function
+fires when error occured.
 
 ##### onBuffering function
 fires when audio is on buffering state

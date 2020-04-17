@@ -13,11 +13,13 @@ export default class audio {
 			getBufferLength = null,
 			crossorigin = "",
 			muted = false,
+			onloaderror = null,
 		} = { ...config };
 		this._audio = new Audio(src);
 		this._hls = null;
 		this._audio.loop = loop;
 		this._audio.muted = muted;
+		this.onloaderror = onloaderror;
 		if (crossorigin) {
 			this._audio.crossorigin = crossorigin;
 		}
@@ -89,6 +91,11 @@ export default class audio {
 			this._hls.on(hls.Events.MANIFEST_PARSED, () => {
 				promise = this._audio.play();
 			});
+			this._hls.on(hls.Events.ERROR, (event, data) => {
+				if (this.onloaderror) {
+					this.onloaderror(data.type);
+				}
+			});
 		} else if (this._audio.canPlayType("application/vnd.apple.mpegurl")) {
 			// native safari
 			this._audio.addEventListener("loadedmetadata", () => {
@@ -102,7 +109,9 @@ export default class audio {
 			promise
 				.then((_) => {})
 				.catch((error) => {
-					throw error;
+					if (this.onloaderror) {
+						this.onloaderror(error);
+					}
 				});
 		}
 	}

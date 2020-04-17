@@ -32,6 +32,9 @@
 					},
 					getBufferLength: (played,bufferLength) => {
 						document.getElementById("buffer").innerHTML = played+" / "+bufferLength;
+					},
+					onloaderror: (err) => {
+						document.getElementById("error").innerHTML = err;
 					}
 				});
 
@@ -61,6 +64,16 @@
 				onclick="audio.play('http://rfcmedia.streamguys1.com/MusicPulse.mp3')"
 			>
 				Today hits
+			</button>
+			<button
+				onclick="audio.play('http://wow2.mari.co.id:1935/mari/genfm/playlist.m3u8')"
+			>
+				Gen
+			</button>
+			<button
+				onclick="audio.play('http://45.64.97.211:9080/;stream/1')"
+			>
+				OZ
 			</button>
 		</div>
 
@@ -104,6 +117,7 @@
 		<button onclick="audio.volume(1)">FULL VOLUME</button>
 
 		<h4>Stats</h4>
+		<p>error : <span id="error"></span></p>
 		<p>current playing : <span id="current"></span></p>
 		<p>current time : <span id="currentTime"></span></p>
 		<p>played / downloaded : <span id="buffer"></span></p>
