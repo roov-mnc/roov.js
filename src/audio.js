@@ -65,6 +65,7 @@ export default class audio {
 
 	play(src) {
 		if (this.isPlaying() && !src) {
+			throw new Error("can't play audio that already play");
 			return;
 		}
 
@@ -101,14 +102,16 @@ export default class audio {
 			this._audio.addEventListener("loadedmetadata", () => {
 				promise = this._audio.play();
 			});
-		} else {
-			promise = this._audio.play();
-		}
+		} 
+			
+		promise = this._audio.play();
+		
 
 		if (promise !== undefined) {
 			promise
 				.then((_) => {})
 				.catch((error) => {
+					throw new Error("something goes wrong",error);
 					if (this.onloaderror) {
 						this.onloaderror(error);
 					}
