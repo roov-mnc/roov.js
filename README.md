@@ -168,6 +168,20 @@ const {Audio} = require('roov');
 
 ```
 
+### ADS
+
+for ads, you have to ad this line code to your html:
+```
+<script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
+```
+
+and put this somewhere in your html body:
+```
+<div id="ad-container"></div>
+```
+
+notes: you can also opt-out from built-in ads function and create your own by using custom onPlay event(https://developers.google.com/interactive-media-ads/docs/sdks/html5)
+
 ### API
 
 #### Options
