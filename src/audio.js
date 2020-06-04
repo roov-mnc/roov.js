@@ -27,7 +27,7 @@ export default class audio {
 		this.onAdFinish = onAdFinish
 		this._audio = document.createElement("video");
 		if (withAds) {
-			this._withAds = true;
+			this._withAds = typeof google === "undefined" ? false : withAds;
 		}
 		if (src) {
 			this._audio.src = src;
@@ -49,13 +49,13 @@ export default class audio {
 		if (crossorigin) {
 			this._audio.crossorigin = crossorigin;
 		}
-		if (onPlay || withAds) {
+		if (onPlay || this._withAds) {
 			this._onPlay = onPlay
 			this._audio.addEventListener("play", (e) => {
 				if (this._onPlay) {
 					this._onPlay();
 				}
-				if (withAds) {
+				if (this._withAds) {
 					this.loadAds(e);
 				}
 			});
@@ -102,6 +102,9 @@ export default class audio {
 	}
 
 	initializeIMA() {
+		if (typeof google === "undefined") {
+			return
+		}
 		// if (this.initializedIMA) {
 		// 	return
 		// }
@@ -129,6 +132,8 @@ export default class audio {
 			(e) => this.onAdError(e),
 			false,
 		);
+
+		console.log(google.ima.AdError)
 
 		var adsRequest = new google.ima.AdsRequest();
 		adsRequest.adTagUrl = this._adsURL;
@@ -180,7 +185,7 @@ export default class audio {
 
 	onAdError(adErrorEvent) {
 		// Handle the error logging.
-		console.log(adErrorEvent.getError());
+		console.log("error occured",adErrorEvent.getError());
 		if (this._adsManager) {
 			this._adsManager.destroy();
 		}
