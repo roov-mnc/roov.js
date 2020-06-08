@@ -367,6 +367,9 @@ export default class audio {
 	}
 
 	volume(v) {
+		if (this._adsManager) {
+			this._adsManager.setVolume(v)
+		}
 		this._audio.volume = v;
 	}
 
