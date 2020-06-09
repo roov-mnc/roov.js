@@ -32,13 +32,7 @@ export default class audio {
 		this._adElement = adElement;
 		this._adsURL = adsURL;
 		this._adsLoaded = false;
-		if (withAds) {
-			try {
-				this.initializeIMA();
-			} catch (err) {
-				console.log(err);
-			}
-		}
+		
 	}
 
 	setupEvent({
@@ -109,6 +103,9 @@ export default class audio {
 
 	initializeIMA() {
 		console.log("initializing IMA");
+		if (this._adsManager) {
+			return;
+		}
 		this._adContainer = document.getElementById(this._adElement);
 		this._adDisplayContainer = new google.ima.AdDisplayContainer(
 			this._adContainer,
@@ -122,7 +119,29 @@ export default class audio {
 
 		this._adsLoader.addEventListener(
 			google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
-			(e) => this.onAdsManagerLoaded(e),
+			(e) => {
+				this.onAdsManagerLoaded(e)
+				var ua = navigator.userAgent.toLowerCase(); 
+				var promise;
+				if (ua.indexOf("safari") != -1) {
+					if (ua.indexOf("chrome") > -1) {
+						promise = this._audio.play();
+
+						if (promise !== undefined) {
+							promise
+								.then((_) => {})
+								.catch((error) => {
+									console.error("error on play", error);
+									if (this.onloaderror) {
+										this.onloaderror(error);
+									}
+								});
+						}
+					} else {
+						this.loadAds();
+					}
+				}
+			},
 			false,
 		);
 		this._adsLoader.addEventListener(
@@ -146,7 +165,7 @@ export default class audio {
 		this._adsManager = adsManagerLoadedEvent.getAdsManager(this._audio);
 		this._adsManager.addEventListener(
 			google.ima.AdErrorEvent.Type.AD_ERROR,
-			(e) => onAdError(e),
+			(e) => this.onAdError(e),
 		);
 		this._adsManager.addEventListener(
 			google.ima.AdEvent.Type.CONTENT_PAUSE_REQUESTED,
@@ -154,12 +173,7 @@ export default class audio {
 				this.pause();
 			},
 		);
-		this._adsManager.addEventListener(
-			google.ima.AdEvent.Type.CONTENT_PAUSE_REQUESTED,
-			() => {
-				this.pause();
-			},
-		);
+		
 		this._adsManager.addEventListener(google.ima.AdEvent.Type.STARTED, () => {
 			this.adsPlaying = true;
 		});
@@ -188,8 +202,6 @@ export default class audio {
 			if (event) {
 				event.preventDefault();	
 			}
-			
-			this._audio.load();
 
 			this._adDisplayContainer.initialize();
 			var width = this._audio.clientWidth;
@@ -205,25 +217,18 @@ export default class audio {
 	}
 
 	browserPlay() {
-		var ua = navigator.userAgent.toLowerCase(); 
-		var promise;
-		if (ua.indexOf("safari") != -1) {
-			if (ua.indexOf("chrome") > -1) {
-				promise = this._audio.play();
-
-				if (promise !== undefined) {
-					promise
-						.then((_) => {})
-						.catch((error) => {
-							console.error("error on play", error);
-							if (this.onloaderror) {
-								this.onloaderror(error);
-							}
-						});
+		if (this._withAds) {
+			try {
+				if  (!this._adsManager) {
+					this.initializeIMA();	
+				} else {
+					this._audio.play()
 				}
-			} else {
-				this.loadAds();
+			} catch (err) {
+				this._audio.play();
 			}
+		} else {
+			this._audio.play();
 		}
 	}
 
@@ -275,7 +280,7 @@ export default class audio {
 
 			return
 		}
-
+		
 		this.browserPlay()
 	}
 
