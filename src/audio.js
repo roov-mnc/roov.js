@@ -198,7 +198,7 @@ export default class audio {
 				this._adsManager.init(width, height, google.ima.ViewMode.NORMAL);
 				this._adsManager.start();
 			} catch (adError) {
-				console.log("AdsManager could not be started");
+				console.log("AdsManager could not be started", adError);
 				this._audio.play();
 			}
 		}
@@ -206,6 +206,7 @@ export default class audio {
 
 	browserPlay() {
 		var ua = navigator.userAgent.toLowerCase(); 
+		var promise;
 		if (ua.indexOf("safari") != -1) {
 			if (ua.indexOf("chrome") > -1) {
 				promise = this._audio.play();
@@ -251,8 +252,6 @@ export default class audio {
 			}
 			this._audio.src = src;
 		}
-
-		var promise;
 
 		if (hls.isSupported() && this.isHLS()) {
 			this._hls = new hls();
