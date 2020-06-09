@@ -2,55 +2,60 @@ import hls from "hls.js/dist/hls.light";
 
 export default class audio {
 	constructor(config) {
-		const {
-			src = "",
-			onLoaded = null,
-			onTimeUpdate = null,
-			onBuffering = null,
-			onPlaying = null,
-			onPlay = null,
-			loop = false,
-			onFinish = null,
-			getBufferLength = null,
-			crossorigin = "",
-			muted = false,
-			onloaderror = null,
-			withAds = false,
-			adElement = "ad-container",
-			adsURL = "",
-			playerId = "",
-			onAdStart = () => console.log("ad start"),
-			onAdFinish = () => console.log("ad end"),
-		} = { ...config };
-		// this._audio = new Audio(src);
-		this.onAdStart = onAdStart
-		this.onAdFinish = onAdFinish
-		this._audio = document.createElement("video");
-		if (withAds) {
-			this._withAds = typeof google === "undefined" ? false : withAds;
-		}
-		if (src) {
-			this._audio.src = src;
-		}
-		this._hls = null;
-		// ads
-		this._adsLoaded = false;
-		this._adContainer = null;
-		this._adElement = adElement;
-		this._adDisplayContainer;
-		this._adsLoader;
-		this._adsURL = adsURL;
-		this._adsManager;
+		// init audio
+		this.initializeAudio(config);
 
-		// audio property
-		this._audio.loop = loop;
-		this._audio.muted = muted;
-		this.onloaderror = onloaderror;
-		if (crossorigin) {
-			this._audio.crossorigin = crossorigin;
+		// init ads
+		this.initializeAds(config);
+
+		// setup event
+		this.setupEvent(config);
+	}
+
+	initializeAudio({ src = "", loop = false, muted = false, id }) {
+		if (id) {
+			this._audio = document.getElementById(id);
+		} else {
+			this._audio = document.createElement("video");
 		}
+
+		this._audio.setAttribute("playsinline", "");
+		this._audio.src = src;
+		this._audio.loop = loop;
+	}
+
+	initializeAds({ withAds = false, adElement = "ad-container", adsURL }) {
+		if (typeof google === "undefined") {
+			return;
+		}
+		this._withAds = withAds;
+		this._adElement = adElement;
+		this._adsURL = adsURL;
+		this._adsLoaded = false;
+		if (withAds) {
+			try {
+				this.initializeIMA();
+			} catch (err) {
+				console.log(err);
+			}
+		}
+	}
+
+	setupEvent({
+		onloaderror,
+		onPlay,
+		onLoaded,
+		onPlaying,
+		onBuffering,
+		onFinish,
+		onTimeUpdate,
+		getBufferLength,
+	}) {
+		this.onloaderror = onloaderror;
+		this._onPlay = onPlay;
+
 		if (onPlay || this._withAds) {
-			this._onPlay = onPlay
+			this._onPlay = onPlay;
 			this._audio.addEventListener("play", (e) => {
 				if (this._onPlay) {
 					this._onPlay();
@@ -60,6 +65,7 @@ export default class audio {
 				}
 			});
 		}
+
 		if (onLoaded) {
 			this._audio.addEventListener("canplay", onLoaded);
 		}
@@ -102,12 +108,6 @@ export default class audio {
 	}
 
 	initializeIMA() {
-		if (typeof google === "undefined") {
-			return
-		}
-		// if (this.initializedIMA) {
-		// 	return
-		// }
 		console.log("initializing IMA");
 		this._adContainer = document.getElementById(this._adElement);
 		this._adDisplayContainer = new google.ima.AdDisplayContainer(
@@ -115,10 +115,8 @@ export default class audio {
 			this._audio,
 		);
 		this._adsLoader = new google.ima.AdsLoader(this._adDisplayContainer);
+
 		this._audio.addEventListener("ended", () => {
-			if (this._onFinish) {
-				this._onFinish();
-			}
 			this._adsLoader.contentComplete();
 		});
 
@@ -133,8 +131,6 @@ export default class audio {
 			false,
 		);
 
-		console.log(google.ima.AdError)
-
 		var adsRequest = new google.ima.AdsRequest();
 		adsRequest.adTagUrl = this._adsURL;
 
@@ -143,15 +139,11 @@ export default class audio {
 		adsRequest.nonLinearAdSlotWidth = this._audio.clientWidth;
 		adsRequest.nonLinearAdSlotHeight = this._audio.clientHeight / 3;
 
-		// Pass the request to the adsLoader to request ads
 		this._adsLoader.requestAds(adsRequest);
-		// this.initializedIMA = true;
 	}
 
 	onAdsManagerLoaded(adsManagerLoadedEvent) {
-		// Instantiate the AdsManager from the adsLoader response and pass it the video element
 		this._adsManager = adsManagerLoadedEvent.getAdsManager(this._audio);
-		this.onAdStart()
 		this._adsManager.addEventListener(
 			google.ima.AdErrorEvent.Type.AD_ERROR,
 			(e) => onAdError(e),
@@ -159,81 +151,95 @@ export default class audio {
 		this._adsManager.addEventListener(
 			google.ima.AdEvent.Type.CONTENT_PAUSE_REQUESTED,
 			() => {
-				// console.log("pause requested")
-				this.pause()
+				this.pause();
 			},
 		);
 		this._adsManager.addEventListener(
 			google.ima.AdEvent.Type.CONTENT_PAUSE_REQUESTED,
 			() => {
-				// console.log("pause requested")
-				this.pause()
+				this.pause();
 			},
 		);
-		this._adsManager.addEventListener(
-			google.ima.AdEvent.Type.COMPLETE,
-			() => {
-				this._audio.play()
-				this._adsComplete = true
-				this.onAdFinish()
-			},
-		);
+		this._adsManager.addEventListener(google.ima.AdEvent.Type.STARTED, () => {
+			this.adsPlaying = true;
+		});
 
-		this._audio.play();
-		
+		this._adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE, () => {
+			this.adsPlaying = false;
+			this._audio.play();
+		});
 	}
 
 	onAdError(adErrorEvent) {
 		// Handle the error logging.
-		console.log("error occured",adErrorEvent.getError());
+		console.log("error occured", adErrorEvent.getError());
 		if (this._adsManager) {
 			this._adsManager.destroy();
 		}
 	}
 
 	loadAds(event) {
-		// Prevent this function from running on if there are already ads loaded
 		if (this._adsLoaded) {
-			return;
+			return false;
 		}
+
 		this._adsLoaded = true;
+		if (this._adDisplayContainer) {
+			if (event) {
+				event.preventDefault();	
+			}
+			
+			this._audio.load();
 
-		// Prevent triggering immediate playback when ads are loading
-		if (event) {	
-			event.preventDefault();
-		} else {
-
+			this._adDisplayContainer.initialize();
+			var width = this._audio.clientWidth;
+			var height = this._audio.clientHeight;
+			try {
+				this._adsManager.init(width, height, google.ima.ViewMode.NORMAL);
+				this._adsManager.start();
+			} catch (adError) {
+				console.log("AdsManager could not be started");
+				this._audio.play();
+			}
 		}
+	}
 
-		console.log("loading ads");
-		this._audio.load();
-		this._adDisplayContainer.initialize();
+	browserPlay() {
+		var ua = navigator.userAgent.toLowerCase(); 
+		if (ua.indexOf("safari") != -1) {
+			if (ua.indexOf("chrome") > -1) {
+				promise = this._audio.play();
 
-		var width = this._audio.clientWidth;
-		var height = this._audio.clientHeight;
-		try {
-			this._adsManager.init(width, height, google.ima.ViewMode.NORMAL);
-			this._adsManager.start();
-		} catch (adError) {
-			// Play the video without ads, if an error occurs
-			console.log("AdsManager could not be started");
-			this._audio.play();
+				if (promise !== undefined) {
+					promise
+						.then((_) => {})
+						.catch((error) => {
+							console.error("error on play", error);
+							if (this.onloaderror) {
+								this.onloaderror(error);
+							}
+						});
+				}
+			} else {
+				this.loadAds();
+			}
 		}
 	}
 
 	play(src) {
-		if (this._adsManager && !this._adsComplete) {
-			this._adsManager.resume()
-			return
+		if (this.adsPlaying) {
+			if (this._adsManager) {
+				this._adsManager.resume();
+			}
+			return;
 		}
-		
 		if (this.isPlaying() && !src) {
-			throw new Error("can't play audio that already play");
+			console.error("can't play audio that already play");
 			return;
 		}
 
 		if (!this._audio.src && !src) {
-			throw new Error("empty src");
+			console.error("empty src");
 		}
 
 		if (src) {
@@ -243,15 +249,7 @@ export default class audio {
 				this._hls.destroy();
 				this._hls = null;
 			}
-			this._adsManager;
 			this._audio.src = src;
-		} else {
-			if (!this._adsComplete) {
-				if (this._adsManager) {
-				this._adsManager.resume()
-			}	
-			}
-			
 		}
 
 		var promise;
@@ -261,51 +259,31 @@ export default class audio {
 			this._hls.loadSource(src);
 			this._hls.attachMedia(this._audio);
 			this._hls.on(hls.Events.MANIFEST_PARSED, () => {
-				if (this._withAds && !this._adsComplete) {
-					this.initializeIMA();
-				} else {
-					promise = this._audio.play();
-				}
+				this.browserPlay()
 			});
 			this._hls.on(hls.Events.ERROR, (event, data) => {
 				if (this.onloaderror) {
 					this.onloaderror(data.type);
 				}
 			});
+
+			return
 		} else if (this._audio.canPlayType("application/vnd.apple.mpegurl")) {
 			// native safari
 			this._audio.addEventListener("loadedmetadata", () => {
-				if (this._withAds && !this._adsComplete) {
-					this.initializeIMA();
-				} else {
-					// this._audio.play();
-					promise = this._audio.play();
-				}
+				this.browserPlay()
 			});
+
+			return
 		}
 
-		if (this._withAds && !this._adsComplete) {
-			this.initializeIMA();
-		} else {
-			promise = this._audio.play();
-		}
-
-		if (promise !== undefined) {
-			promise
-				.then((_) => {})
-				.catch((error) => {
-					throw new Error(error);
-					if (this.onloaderror) {
-						this.onloaderror(error);
-					}
-				});
-		}
+		this.browserPlay()
 	}
 
 	pause() {
 		this._audio.pause();
 		if (this._adsManager) {
-			this._adsManager.pause()
+			this._adsManager.pause();
 		}
 	}
 
@@ -359,7 +337,11 @@ export default class audio {
 	}
 
 	muted() {
-		this._audio.muted = !this._audio.muted;
+		if (this._audio.volume != 0) {
+			this.volume(0);
+		} else {
+			this.volume(1);
+		}
 	}
 
 	forward(time) {
@@ -368,7 +350,7 @@ export default class audio {
 
 	volume(v) {
 		if (this._adsManager) {
-			this._adsManager.setVolume(v)
+			this._adsManager.setVolume(v);
 		}
 		this._audio.volume = v;
 	}

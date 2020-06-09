@@ -1,143 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<title>ROOV JS</title>
-		<script src="dist/index.js"></script>
-		<meta name="viewport" content="initial-scale=1.0, width=device-width" />
-		<script src="//imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
-		<script type="text/javascript">
-				var audio
-				window.addEventListener('load', function(event) {
-					const eventAt5Second = () => {
-						document.getElementById("5s").innerHTML = "triggered";
-					}
-					var isEventAt5SecondTriggered = false
-					audio = new roov.audio({
-						withAds: true,
-						adsURL: 'https://pubads.g.doubleclick.net/gampad/ads?' +
-      'sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&' +
-      'impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&' +
-      'cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=',
-						onLoaded: () => {
-							document.getElementById("duration").innerHTML = audio.duration();
-							document.getElementById("current").innerHTML = audio.current();
-						},
-						onTimeUpdate: () => {
-							document.getElementById("currentTime").innerHTML = audio.currentTime();
-							if (!isEventAt5SecondTriggered && audio.currentTime() > 5) {
-								eventAt5Second()
-								isEventAt5SecondTriggered = true
-							}
-						},
-						onPlaying: () => {
-							document.getElementById("state").innerHTML = "playing";
-						},
-						onBuffering: () => {
-							document.getElementById("state").innerHTML = "buffering";
-						},
-						onFinish: () => {
-							document.getElementById("state").innerHTML = "finish";
-						},
-						getBufferLength: (played,bufferLength) => {
-							document.getElementById("buffer").innerHTML = played+" / "+bufferLength;
-						},
-						onloaderror: (err) => {
-							document.getElementById("error").innerHTML = err;
-						}
-					});
 
-				function seek(event) {
-				  	if (event.which == 13 || event.keyCode == 13) {
-							audio.seek(event.target.value)
-				      return false;
-				  	}
-				  	return true;
-				}
+<head>
+    <meta charset="UTF-8" />
+    <title>ROOV JS</title>
+    <script src="dist/index.js"></script>
+    <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+    <script src="dist/ima.js"></script>
+    <script type="text/javascript">
+    var audio;
 
-				function loop() {
-					audio.loop()
-					document.getElementById("loop").innerHTML = audio.native().loop;
-				}
+    function seek(event) {
+        if (event.which == 13 || event.keyCode == 13) {
+            audio.seek(event.target.value);
+            return false;
+        }
+        return true;
+    }
 
-				function muted() {
-					audio.muted()
-					document.getElementById("muted").innerHTML = audio.native().muted;
-				}
-			})
-		</script>
-	</head>
-	<body>
-		<h4>all of the sample contain ads example</h4>
-		<div id="ad-container"></div>
-		<h4>Common radio streaming</h4>
-		<div>
-			<button
-				onclick="audio.play('http://rfcmedia.streamguys1.com/MusicPulse.mp3')"
-			>
-				Today hits
-			</button>
-			<button
-				onclick="audio.play('http://wow2.mari.co.id:1935/mari/genfm/playlist.m3u8')"
-			>
-				Gen
-			</button>
-			<button onclick="audio.play('http://45.64.97.211:1031/;stream/1')">
-				OZ
-			</button>
-			<button onclick="audio.play('http://103.56.207.10:9346/;')">
-				classic
-			</button>
-		</div>
+    function loop() {
+        audio.loop();
+    }
 
-		<h4>HLS radio streaming</h4>
-		<div>
-			<button
-				onclick="audio.play('https://cogecomedia.leanstream.co/cogecomedia/CKBEFM.stream/playlist.m3u8')"
-			>
-				ESPANA(HLS)
-			</button>
-		</div>
+    function muted() {
+        audio.muted();
+    }
+    window.addEventListener("load", function(event) {
+        const eventAt5Second = () => {
+            document.getElementById("5s").innerHTML = "triggered";
+        };
+        var isEventAt5SecondTriggered = false;
+        audio = new roov.audio({
+            id: "video-element",
+            withAds: true,
+            adsURL: "https://pubads.g.doubleclick.net/gampad/ads?" +
+                "sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&" +
+                "impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&" +
+                "cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=",
+            onLoaded: () => {
+                document.getElementById("duration").innerHTML = audio.duration();
+                document.getElementById("current").innerHTML = audio.current();
+            },
+            onTimeUpdate: () => {
+                document.getElementById(
+                    "currentTime",
+                ).innerHTML = audio.currentTime();
+                if (!isEventAt5SecondTriggered && audio.currentTime() > 5) {
+                    eventAt5Second();
+                    isEventAt5SecondTriggered = true;
+                }
+            },
+            onPlaying: () => {
+                document.getElementById("state").innerHTML = "playing";
+            },
+            onBuffering: () => {
+                document.getElementById("state").innerHTML = "buffering";
+            },
+            onFinish: () => {
+                document.getElementById("state").innerHTML = "finish";
+            },
+            getBufferLength: (played, bufferLength) => {
+                document.getElementById("buffer").innerHTML =
+                    played + " / " + bufferLength;
+            },
+            onloaderror: (err) => {
+                document.getElementById("error").innerHTML = err;
+            },
+        });
+    });
+    </script>
+</head>
 
-		<h4>Play AUDIO</h4>
-		<div>
-			<button
-				onclick="audio.play('https://raw.githubusercontent.com/goldfire/howler.js/master/examples/player/audio/80s_vibe.mp3')"
-			>
-				80 vibes
-			</button>
-			<button
-				onclick="audio.play('https://raw.githubusercontent.com/goldfire/howler.js/master/examples/player/audio/rave_digger.mp3')"
-			>
-				Rave digger
-			</button>
-		</div>
+<body>
+    <h4>all of the sample contain ads example</h4>
+    <div id="ad-container"></div>
+    <video id="video-element"></video>
+    <h4>Play AUDIO</h4>
+    <div>
+    		<button onclick="audio.play('http://rfcmedia.streamguys1.com/MusicPulse.mp3')">
+            Today hits
+        </button>
+        <button onclick="audio.play('http://wow2.mari.co.id:1935/mari/genfm/playlist.m3u8')">
+            Gen
+        </button>
+        <button onclick="audio.play('http://45.64.97.211:1031/;stream/1')">
+            OZ
+        </button>
+        <button onclick="audio.play('http://103.56.207.10:9346/;')">
+            classic
+        </button>
+        <button onclick="audio.play('https://cogecomedia.leanstream.co/cogecomedia/CKBEFM.stream/playlist.m3u8')">
+            ESPANA(HLS)
+        </button>
+        <button onclick="audio.play('https://raw.githubusercontent.com/goldfire/howler.js/master/examples/player/audio/80s_vibe.mp3')">
+            80 vibes
+        </button>
+        <button onclick="audio.play('https://raw.githubusercontent.com/goldfire/howler.js/master/examples/player/audio/rave_digger.mp3')">
+            Rave digger
+        </button>
+    </div>
+    <h4>Control</h4>
+    <button onclick="audio.pause()">PAUSE</button>
+    <button onclick="audio.play()">PLAY</button>
+    <button onclick="audio.stop()">STOP</button>
+    <button onclick="audio.unload()">UNLOAD</button>
+    <button onclick="audio.restart()">RESTART</button>
+    <br /><br />
+    <div>seek : <input type="number" onkeypress="seek(event)" /></div>
+    <br /><br />
+    <button onclick="audio.forward(5)">FORWARD 5s</button>
+    <button onclick="audio.rewind(5)">REWIND 5s</button>
+    <button onclick="loop()">LOOP</button>
+    <button onclick="muted()">MUTED</button>
+    <button onclick="audio.volume(0.5)">HALF VOLUME</button>
+    <button onclick="audio.volume(1)">FULL VOLUME</button>
+    <h4>Stats</h4>
+    <p>error : <span id="error"></span></p>
+    <p>current playing : <span id="current"></span></p>
+    <p>current time : <span id="currentTime"></span></p>
+    <p>played / downloaded : <span id="buffer"></span></p>
+    <p>state : <span id="state"></span></p>
+    <p>duration : <span id="duration"></span></p>
+    <p>loop : <span id="loop">false</span></p>
+    <p>muted : <span id="muted">false</span></p>
+    <p>event 5s : <span id="5s">not triggered</span></p>
+</body>
 
-		<h4>Control</h4>
-		<button onclick="audio.pause()">PAUSE</button>
-		<button onclick="audio.play()">PLAY</button>
-		<button onclick="audio.stop()">STOP</button>
-		<button onclick="audio.unload()">UNLOAD</button>
-		<button onclick="audio.restart()">RESTART</button>
-		<br /><br />
-		<div>seek : <input type="number" onkeypress="seek(event)" /></div>
-		<br /><br />
-		<button onclick="audio.forward(5)">FORWARD 5s</button>
-		<button onclick="audio.rewind(5)">REWIND 5s</button>
-		<button onclick="loop()">LOOP</button>
-		<button onclick="muted()">MUTED</button>
-		<button onclick="audio.volume(0.5)">HALF VOLUME</button>
-		<button onclick="audio.volume(1)">FULL VOLUME</button>
-
-		<h4>Stats</h4>
-		<p>error : <span id="error"></span></p>
-		<p>current playing : <span id="current"></span></p>
-		<p>current time : <span id="currentTime"></span></p>
-		<p>played / downloaded : <span id="buffer"></span></p>
-		<p>state : <span id="state"></span></p>
-		<p>duration : <span id="duration"></span></p>
-		<p>loop : <span id="loop">false</span></p>
-		<p>muted : <span id="muted">false</span></p>
-		<p>event 5s : <span id="5s">not triggered</span></p>
-	</body>
 </html>
