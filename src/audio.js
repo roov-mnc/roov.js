@@ -18,7 +18,7 @@ export default class audio {
 		} else {
 			this._audio = document.createElement("video");
 		}
-
+		this.src = src;
 		this._audio.setAttribute("playsinline", "");
 		this._audio.src = src;
 		this._audio.loop = loop;
@@ -123,24 +123,7 @@ export default class audio {
 				this.onAdsManagerLoaded(e)
 				var ua = navigator.userAgent.toLowerCase(); 
 				var promise;
-				if (ua.indexOf("safari") != -1) {
-					if (ua.indexOf("chrome") > -1) {
-						promise = this._audio.play();
-
-						if (promise !== undefined) {
-							promise
-								.then((_) => {})
-								.catch((error) => {
-									console.error("error on play", error);
-									if (this.onloaderror) {
-										this.onloaderror(error);
-									}
-								});
-						}
-					} else {
-						this.loadAds();
-					}
-				}
+				this.loadAds();
 			},
 			false,
 		);
@@ -180,7 +163,8 @@ export default class audio {
 
 		this._adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE, () => {
 			this.adsPlaying = false;
-			this._audio.play();
+			this._audio.src = this.src;
+			this._audio.play()
 		});
 	}
 
@@ -249,6 +233,7 @@ export default class audio {
 		}
 
 		if (src) {
+			this.src = src
 			if (this._hls) {
 				this._hls.detachMedia();
 				this._hls.stopLoad();
