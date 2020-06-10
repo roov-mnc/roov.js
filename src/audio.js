@@ -32,6 +32,9 @@ export default class audio {
 		this._adElement = adElement;
 		this._adsURL = adsURL;
 		this._adsLoaded = false;
+		if (withAds) {
+			this.initializeIMA();	
+		}
 		
 	}
 
@@ -106,6 +109,7 @@ export default class audio {
 		if (this._adsManager) {
 			return;
 		}
+
 		this._adContainer = document.getElementById(this._adElement);
 		this._adDisplayContainer = new google.ima.AdDisplayContainer(
 			this._adContainer,
@@ -121,9 +125,6 @@ export default class audio {
 			google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
 			(e) => {
 				this.onAdsManagerLoaded(e)
-				var ua = navigator.userAgent.toLowerCase(); 
-				var promise;
-				this.loadAds();
 			},
 			false,
 		);
@@ -145,6 +146,7 @@ export default class audio {
 	}
 
 	onAdsManagerLoaded(adsManagerLoadedEvent) {
+		console.log("ads manager loaded")
 		this._adsManager = adsManagerLoadedEvent.getAdsManager(this._audio);
 		this._adsManager.addEventListener(
 			google.ima.AdErrorEvent.Type.AD_ERROR,
@@ -195,6 +197,7 @@ export default class audio {
 				this._adsManager.start();
 			} catch (adError) {
 				console.log("AdsManager could not be started", adError);
+				this._adsManager = {}
 				this._audio.play();
 			}
 		}
@@ -204,7 +207,7 @@ export default class audio {
 		if (this._withAds) {
 			try {
 				if  (!this._adsManager) {
-					this.initializeIMA();	
+					this.loadAds()
 				} else {
 					this._audio.play()
 				}
@@ -218,7 +221,7 @@ export default class audio {
 
 	play(src) {
 		if (this.adsPlaying) {
-			if (this._adsManager) {
+			if (this._adsManager && !this._adsLoaded) {
 				this._adsManager.resume();
 			}
 			return;
