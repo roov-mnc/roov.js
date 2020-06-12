@@ -204,14 +204,17 @@ export default class audio {
 	}
 
 	browserPlay() {
+		console.log("browserPlay")
 		if (this._withAds) {
 			try {
 				if  (!this._adsManager) {
+					console.log("trying to load ads")
 					this.loadAds()
 				} else {
 					this._audio.play()
 				}
 			} catch (err) {
+				console.log("error occured", err)
 				this._audio.play();
 			}
 		} else {
@@ -221,10 +224,11 @@ export default class audio {
 
 	play(src) {
 		if (this.adsPlaying) {
-			if (this._adsManager && !this._adsLoaded) {
+			if (this._adsManager) {
 				this._adsManager.resume();
 			}
-			return;
+			console.log("resume ads")
+			return
 		}
 		if (this.isPlaying() && !src) {
 			console.error("can't play audio that already play");
@@ -259,14 +263,14 @@ export default class audio {
 				}
 			});
 
-			return
+			// return
 		} else if (this._audio.canPlayType("application/vnd.apple.mpegurl")) {
 			// native safari
 			this._audio.addEventListener("loadedmetadata", () => {
 				this.browserPlay()
 			});
 
-			return
+			// return
 		}
 		
 		this.browserPlay()
