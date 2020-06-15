@@ -225,7 +225,9 @@ export default class audio {
 	play(src) {
 		if (this.adsPlaying) {
 			if (this._adsManager) {
+				if (Object.keys(this._adsManager).length != 0) {
 				this._adsManager.resume();
+			}
 			}
 			console.log("resume ads")
 			return
@@ -279,7 +281,9 @@ export default class audio {
 	pause() {
 		this._audio.pause();
 		if (this._adsManager) {
+			if (Object.keys(this._adsManager).length != 0) {
 			this._adsManager.pause();
+			}
 		}
 	}
 
@@ -346,7 +350,9 @@ export default class audio {
 
 	volume(v) {
 		if (this._adsManager) {
+			if (Object.keys(this._adsManager).length != 0) {
 			this._adsManager.setVolume(v);
+			}
 		}
 		this._audio.volume = v;
 	}
