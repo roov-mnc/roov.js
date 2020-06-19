@@ -33,9 +33,8 @@ export default class audio {
 		this._adsURL = adsURL;
 		this._adsLoaded = false;
 		if (withAds) {
-			this.initializeIMA();	
+			this.initializeIMA();
 		}
-		
 	}
 
 	setupEvent({
@@ -124,7 +123,7 @@ export default class audio {
 		this._adsLoader.addEventListener(
 			google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
 			(e) => {
-				this.onAdsManagerLoaded(e)
+				this.onAdsManagerLoaded(e);
 			},
 			false,
 		);
@@ -146,7 +145,7 @@ export default class audio {
 	}
 
 	onAdsManagerLoaded(adsManagerLoadedEvent) {
-		console.log("ads manager loaded")
+		console.log("ads manager loaded");
 		this._adsManager = adsManagerLoadedEvent.getAdsManager(this._audio);
 		this._adsManager.addEventListener(
 			google.ima.AdErrorEvent.Type.AD_ERROR,
@@ -158,7 +157,7 @@ export default class audio {
 				this.pause();
 			},
 		);
-		
+
 		this._adsManager.addEventListener(google.ima.AdEvent.Type.STARTED, () => {
 			this.adsPlaying = true;
 		});
@@ -166,7 +165,14 @@ export default class audio {
 		this._adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE, () => {
 			this.adsPlaying = false;
 			this._audio.src = this.src;
-			this._audio.play()
+			this._playPromise = this._audio.play();
+			this._playPromise.then(_ => {
+			      this._audio.play()
+			    })
+			    .catch(error => {
+			      // console.log("error during play", error)
+			      this._audio.play()
+			    });
 		});
 	}
 
@@ -186,7 +192,7 @@ export default class audio {
 		this._adsLoaded = true;
 		if (this._adDisplayContainer) {
 			if (event) {
-				event.preventDefault();	
+				// event.preventDefault();
 			}
 
 			this._adDisplayContainer.initialize();
@@ -197,28 +203,32 @@ export default class audio {
 				this._adsManager.start();
 			} catch (adError) {
 				console.log("AdsManager could not be started", adError);
-				this._adsManager = {}
+				this._adsManager = {};
 				this._audio.play();
 			}
 		}
 	}
 
 	browserPlay() {
-		console.log("browserPlay")
-		if (this._withAds) {
-			try {
-				if  (!this._adsManager) {
-					console.log("trying to load ads")
-					this.loadAds()
-				} else {
-					this._audio.play()
+		// console.log("browserPlay")
+		if (this._playPromise === undefined) {
+			if (this._withAds) {
+				try {
+					if (!this._adsManager) {
+						console.log("trying to load ads");
+						this.loadAds();
+					} else {
+						this._playPromise = this._audio.play();
+					}
+				} catch (err) {
+					// console.log("error occured", err);
+					this._playPromise = this._audio.play();
 				}
-			} catch (err) {
-				console.log("error occured", err)
-				this._audio.play();
+			} else {
+				this._playPromise = this._audio.play();
 			}
 		} else {
-			this._audio.play();
+			this._playPromise = this._audio.play();
 		}
 	}
 
@@ -226,11 +236,11 @@ export default class audio {
 		if (this.adsPlaying) {
 			if (this._adsManager) {
 				if (Object.keys(this._adsManager).length != 0) {
-				this._adsManager.resume();
+					this._adsManager.resume();
+				}
 			}
-			}
-			console.log("resume ads")
-			return
+			console.log("resume ads");
+			return;
 		}
 		if (this.isPlaying() && !src) {
 			console.error("can't play audio that already play");
@@ -242,7 +252,7 @@ export default class audio {
 		}
 
 		if (src) {
-			this.src = src
+			this.src = src;
 			if (this._hls) {
 				this._hls.detachMedia();
 				this._hls.stopLoad();
@@ -257,7 +267,7 @@ export default class audio {
 			this._hls.loadSource(src);
 			this._hls.attachMedia(this._audio);
 			this._hls.on(hls.Events.MANIFEST_PARSED, () => {
-				this.browserPlay()
+				this.browserPlay();
 			});
 			this._hls.on(hls.Events.ERROR, (event, data) => {
 				if (this.onloaderror) {
@@ -269,37 +279,46 @@ export default class audio {
 		} else if (this._audio.canPlayType("application/vnd.apple.mpegurl")) {
 			// native safari
 			this._audio.addEventListener("loadedmetadata", () => {
-				this.browserPlay()
+				this.browserPlay();
 			});
 
 			// return
 		}
-		
-		this.browserPlay()
+
+		this.browserPlay();
 	}
 
 	pause() {
-		this._audio.pause();
+		if (this._playPromise !== undefined) {
+			this._playPromise
+				.then((_) => {
+					this._audio.pause();
+				})
+				.catch((error) => {
+					// console.log("error on pause", error);
+				});
+		}
+
 		if (this._adsManager) {
 			if (Object.keys(this._adsManager).length != 0) {
-			this._adsManager.pause();
+				this._adsManager.pause();
 			}
 		}
 	}
 
 	stop() {
-		this._audio.pause();
+		this.pause();
 		this._audio.currentTime = 0;
 	}
 
 	restart() {
-		this._audio.pause();
+		this.pause();
 		this._audio.currentTime = 0;
 		this._audio.play();
 	}
 
 	unload() {
-		this._audio.pause();
+		this.pause();
 		this._audio.removeAttribute("src");
 		this._audio.load();
 	}
@@ -351,7 +370,7 @@ export default class audio {
 	volume(v) {
 		if (this._adsManager) {
 			if (Object.keys(this._adsManager).length != 0) {
-			this._adsManager.setVolume(v);
+				this._adsManager.setVolume(v);
 			}
 		}
 		this._audio.volume = v;
