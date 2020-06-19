@@ -295,9 +295,11 @@ export default class audio {
 					this._audio.pause();
 				})
 				.catch((error) => {
-					// console.log("error on pause", error);
+					this._audio.pause();
 				});
-		}
+		} 
+
+		// console.log("pause clicked")
 
 		if (this._adsManager) {
 			if (Object.keys(this._adsManager).length != 0) {
