@@ -192,7 +192,7 @@ export default class audio {
 		this._adsLoaded = true;
 		if (this._adDisplayContainer) {
 			if (event) {
-				// event.preventDefault();
+				event.preventDefault();
 			}
 
 			this._adDisplayContainer.initialize();
@@ -289,6 +289,7 @@ export default class audio {
 	}
 
 	pause() {
+		this._audio.pause();
 		if (this._playPromise !== undefined) {
 			this._playPromise
 				.then((_) => {
@@ -306,6 +307,13 @@ export default class audio {
 				this._adsManager.pause();
 			}
 		}
+
+		try {
+				this._audio.pause();
+			} catch (err) {
+				this._audio.pause();
+			}
+		
 	}
 
 	stop() {
